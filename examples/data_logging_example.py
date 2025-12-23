@@ -42,16 +42,17 @@ async def collect_data(mac, queue, collection_time):
         await queue.put(None)
 
 def log_packet(packet):
-    if isinstance(packet, StatusPacket):
-        logging.info(f"{time.ctime(packet.timestamp)} - Status Packet - Battery: {packet.battery_level}%, Charging: {packet.charging}, Error: {packet.error_flag}")
-    elif isinstance(packet, SPS30Packet):
-        logging.info(f"{time.ctime(packet.timestamp)} - SPS30 Packet - PM1: {packet.pm1} µg/m³, PM2.5: {packet.pm2_5} µg/m³, PM4: {packet.pm4} µg/m³, PM10: {packet.pm10} µg/m³")
-    elif isinstance(packet, BME280Packet):
-        logging.info(f"{time.ctime(packet.timestamp)} - BME280 Packet - Humidity: {packet.humidity}%, Temperature: {packet.temperature}°C, Pressure: {packet.pressure} mBar")
-    elif isinstance(packet, SGPC3Packet):
-        logging.info(f"{time.ctime(packet.timestamp)} - SGPC3 Packet - TVOC: {packet.tvoc} ppb")
-    else:
-        logging.info("Unknown packet type")
+    match packet:
+        case StatusPacket():
+            logging.info(f"{time.ctime(packet.timestamp)} - Status Packet - Battery: {packet.battery_level}%, Charging: {packet.charging}, Error: {packet.error_flag}")
+        case SPS30Packet():
+            logging.info(f"{time.ctime(packet.timestamp)} - SPS30 Packet - PM1: {packet.pm1} µg/m³, PM2.5: {packet.pm2_5} µg/m³, PM4: {packet.pm4} µg/m³, PM10: {packet.pm10} µg/m³")
+        case BME280Packet():
+            logging.info(f"{time.ctime(packet.timestamp)} - BME280 Packet - Humidity: {packet.humidity}%, Temperature: {packet.temperature}°C, Pressure: {packet.pressure} mBar")
+        case SGPC3Packet():
+            logging.info(f"{time.ctime(packet.timestamp)} - SGPC3 Packet - TVOC: {packet.tvoc} ppb")
+        case _:
+            logging.info("Unknown packet type")
 
 def main():
     mac = ATMOTUBE
