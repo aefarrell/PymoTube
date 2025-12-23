@@ -58,3 +58,4 @@ example_sgpc3 = bytearray(b'\x02\x00\x00\x00')
 packet = SGPC3Packet(example_sgpc3)
 
 # packet.tvoc : float - the total VOC in ppm
+```
