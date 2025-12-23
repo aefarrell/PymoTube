@@ -14,6 +14,6 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/aefarrell/PymoTube",
     license='MIT',
-    python_requires='>=3.13',
+    python_requires='>=3.11',
     install_requires=['bleak']
 )
