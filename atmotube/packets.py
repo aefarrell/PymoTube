@@ -9,10 +9,10 @@ class AtmoTubePacket(LittleEndianStructure):
         if ts is None:
             ts = time.time()
         self.timestamp = ts
-        self.__process_bytes__()
+        self._process_bytes()
 
-    def __process_bytes__(self):
-        pass
+    def _process_bytes(self):
+        ...
 
 
 class StatusPacket(AtmoTubePacket):
@@ -28,7 +28,7 @@ class StatusPacket(AtmoTubePacket):
                 ("_battery",            c_ubyte, 8),
     ]
 
-    def __process_bytes__(self):
+    def _process_bytes(self):
         self.pm_sensor_status = bool(self._pm_sensor)
         self.error_flag = bool(self._error)
         self.bonding_flag = bool(self._bonding)
@@ -36,6 +36,12 @@ class StatusPacket(AtmoTubePacket):
         self.charging_timer = bool(self._charging_timer)
         self.pre_heating = bool(self._pre_heating)
         self.battery_level = self._battery
+    
+    def __str__(self):
+        return (f"StatusPacket(pm_sensor_status={self.pm_sensor_status}, "
+                f"error_flag={self.error_flag}, bonding_flag={self.bonding_flag}, "
+                f"charging={self.charging}, charging_timer={self.charging_timer}, "
+                f"pre_heating={self.pre_heating}, battery_level={self.battery_level}%)")
 
 class SPS30Packet(AtmoTubePacket):
     _fields_ = [
@@ -50,11 +56,15 @@ class SPS30Packet(AtmoTubePacket):
         res = int.from_bytes(byte_array, byteorder='little', signed=True)
         return res/100.0 if res >0 else None
 
-    def __process_bytes__(self):
+    def _process_bytes(self):
         self.pm1 = self.pm_from_bytes(self._pm1)
         self.pm2_5 = self.pm_from_bytes(self._pm2_5)
         self.pm10 = self.pm_from_bytes(self._pm10)
         self.pm4 = self.pm_from_bytes(self._pm4)
+    
+    def __str__(self):
+        return (f"SPS30Packet(pm1={self.pm1}µg/m³, pm2_5={self.pm2_5}µg/m³, "
+                f"pm10={self.pm10}µg/m³, pm4={self.pm4}µg/m³)")
 
 class BME280Packet(AtmoTubePacket):
     _fields_ = [
@@ -65,10 +75,14 @@ class BME280Packet(AtmoTubePacket):
         ]
     _pack_ = 1
 
-    def __process_bytes__(self):
+    def _process_bytes(self):
         self.humidity = self._rh if self._rh > 0 else None
         self.temperature = self._T_dec / 100.0 # I'm not sure what the error condition is
         self.pressure = self._P / 100.0 if self._P > 0 else None
+    
+    def __str__(self):
+        return (f"BME280Packet(humidity={self.humidity}%, "
+                f"temperature={self.temperature}°C, pressure={self.pressure}mbar)")
 
 class SGPC3Packet(AtmoTubePacket):
     _fields_ = [
@@ -76,5 +90,8 @@ class SGPC3Packet(AtmoTubePacket):
     ]
     _pack_ = 1
 
-    def __process_bytes__(self):
+    def _process_bytes(self):
         self.tvoc = self._tvoc/1000.0 if self._tvoc > 0 else None
+
+    def __str__(self):
+        return f"SGPC3Packet(tvoc={self.tvoc}ppb)"

@@ -4,7 +4,7 @@
 
 import asyncio
 from bleak import BleakClient, BleakScanner
-from PymoTube.uuids import SPS30_UUID, STATUS_UUID, BME280_UUID, SGPC3_UUID
+from atmotube import AtmoTube_GATT_UUIDs
 
 ATMOTUBE      = "C2:2B:42:15:30:89" # the mac address of my Atmotube
 
@@ -26,10 +26,10 @@ async def collect_data(mac, queue, collection_time):
         raise Exception("Device not found")
     
     async with BleakClient(device) as client:
-        await client.start_notify(SPS30_UUID, sps30_cb)
-        await client.start_notify(STATUS_UUID, status_cb)
-        await client.start_notify(BME280_UUID, bme280_cb)
-        await client.start_notify(SGPC3_UUID, sgp30_cb)
+        await client.start_notify(AtmoTube_GATT_UUIDs.SPS30, sps30_cb)
+        await client.start_notify(AtmoTube_GATT_UUIDs.STATUS, status_cb)
+        await client.start_notify(AtmoTube_GATT_UUIDs.BME280, bme280_cb)
+        await client.start_notify(AtmoTube_GATT_UUIDs.SGPC3, sgp30_cb)
         await asyncio.sleep(collection_time)
         await queue.put(None)
 
