@@ -9,7 +9,7 @@ setuptools.setup(
     author="Allan Farrell",
     author_email="allanf@protonmail.com",
     packages=["atmotube"],
-    description="A simple API for retrieving data from an AtmoTube via bluetooth",
+    description="A module for retrieving data from an AtmoTube via bluetooth",
     long_description=description,
     long_description_content_type="text/markdown",
     url="https://github.com/aefarrell/PymoTube",
