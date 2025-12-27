@@ -90,6 +90,5 @@ def main():
 
 
 if __name__ == "__main__":
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
+    logging.basicConfig(level=logging.INFO)
     main()
