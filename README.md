@@ -1,5 +1,7 @@
 # PymoTube
-A simple API for retrieving data from an AtmoTube via bluetooth. Very much in development.
+[![Tests](https://github.com/aefarrell/PymoTube/actions/workflows/python-package.yml/badge.svg)](https://github.com/aefarrell/PymoTube/actions/workflows/python-package.yml)
+
+A simple package for retrieving data from an AtmoTube via bluetooth. Very much in development.
 
 Currently it is just a set of helper classes for taking bytearrays returned by the AtmoTube and turning it into a basic struct.
 
