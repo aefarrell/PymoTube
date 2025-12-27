@@ -1,5 +1,5 @@
 from ctypes import LittleEndianStructure, c_ubyte, c_byte, c_short, c_int
-import time
+from datetime import datetime
 
 
 class InvalidByteData(Exception):
@@ -9,16 +9,16 @@ class InvalidByteData(Exception):
 class AtmoTubePacket(LittleEndianStructure):
     _byte_size_ = 0  # To be defined in subclasses
 
-    def __new__(cls, data, ts=None):
+    def __new__(cls, data, date_time=None):
         if len(data) != cls._byte_size_:
             raise InvalidByteData(f"Expected {cls._byte_size_} bytes, "
                                   f"got {len(data)} bytes")
         return cls.from_buffer_copy(data)
 
-    def __init__(self, data, ts=None):
-        if ts is None:
-            ts = time.time()
-        self.timestamp = ts
+    def __init__(self, data, date_time=None):
+        if date_time is None:
+            date_time = datetime.now()
+        self.date_time = date_time
         self._process_bytes()
 
     def __repr__(self):
@@ -53,7 +53,7 @@ class StatusPacket(AtmoTubePacket):
         self.battery_level = self._battery
 
     def __str__(self):
-        return (f"StatusPacket(timestamp={time.ctime(self.timestamp)}, "
+        return (f"StatusPacket(date_time={str(self.date_time)}, "
                 f"pm_sensor_status={self.pm_sensor_status}, "
                 f"error_flag={self.error_flag}, "
                 f"bonding_flag={self.bonding_flag}, "
@@ -86,7 +86,7 @@ class SPS30Packet(AtmoTubePacket):
         self.pm4 = self.pm_from_bytes(self._pm4)
 
     def __str__(self):
-        return (f"SPS30Packet(timestamp={time.ctime(self.timestamp)}, "
+        return (f"SPS30Packet(date_time={str(self.date_time)}, "
                 f"pm1={self.pm1}µg/m³, pm2_5={self.pm2_5}µg/m³, "
                 f"pm10={self.pm10}µg/m³, pm4={self.pm4}µg/m³)")
 
@@ -109,7 +109,7 @@ class BME280Packet(AtmoTubePacket):
         self.pressure = self._P / 100.0 if self._P > 0 else None
 
     def __str__(self):
-        return (f"BME280Packet(timestamp={time.ctime(self.timestamp)}, "
+        return (f"BME280Packet(date_time={str(self.date_time)}, "
                 f"humidity={self.humidity}%, "
                 f"temperature={self.temperature}°C, "
                 f"pressure={self.pressure}mbar)")
@@ -128,5 +128,5 @@ class SGPC3Packet(AtmoTubePacket):
         self.tvoc = self._tvoc/1000.0 if self._tvoc > 0 else None
 
     def __str__(self):
-        return (f"SGPC3Packet(timestamp={time.ctime(self.timestamp)}, "
+        return (f"SGPC3Packet(date_time={str(self.date_time)}, "
                 f"tvoc={self.tvoc}ppb)")

@@ -10,7 +10,6 @@ from atmotube import AtmoTube_GATT_UUIDs, SPS30Packet, StatusPacket
 from atmotube import BME280Packet, SGPC3Packet
 import asyncio
 import logging
-import time
 
 ATMOTUBE = "C2:2B:42:15:30:89"  # the mac address of my Atmotube
 
@@ -48,23 +47,23 @@ async def collect_data(mac, queue, collection_time):
 def log_packet(packet):
     match packet:
         case StatusPacket():
-            logging.info(f"{time.ctime(packet.timestamp)} - Status Packet - "
+            logging.info(f"{str(packet.date_time)} - Status Packet - "
                          f"Battery: {packet.battery_level}%, "
                          f"Charging: {packet.charging}, "
                          f"Error: {packet.error_flag}")
         case SPS30Packet():
-            logging.info(f"{time.ctime(packet.timestamp)} - SPS30 Packet - "
+            logging.info(f"{str(packet.date_time)} - SPS30 Packet - "
                          f"PM1: {packet.pm1} µg/m³, "
                          f"PM2.5: {packet.pm2_5} µg/m³, "
                          f"PM4: {packet.pm4} µg/m³, "
                          f"PM10: {packet.pm10} µg/m³")
         case BME280Packet():
-            logging.info(f"{time.ctime(packet.timestamp)} - BME280 Packet - "
+            logging.info(f"{str(packet.date_time)} - BME280 Packet - "
                          f"Humidity: {packet.humidity}%, "
                          f"Temperature: {packet.temperature}°C, "
                          f"Pressure: {packet.pressure} mbar")
         case SGPC3Packet():
-            logging.info(f"{time.ctime(packet.timestamp)} - SGPC3 Packet - "
+            logging.info(f"{str(packet.date_time)} - SGPC3 Packet - "
                          f"TVOC: {packet.tvoc} ppb")
         case _:
             logging.info("Unknown packet type")
