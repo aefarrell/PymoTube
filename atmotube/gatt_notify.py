@@ -3,11 +3,12 @@ from .packets import AtmoTubePacket
 from .packets import StatusPacket, SPS30Packet, BME280Packet, SGPC3Packet
 from bleak import BleakClient, BleakGATTCharacteristic
 from collections.abc import Callable, Awaitable
+from typing import TypeAlias
 
 import asyncio
 import inspect
 
-type PacketList = list[tuple[AtmoTube_GATT_UUID, AtmoTubePacket]]
+PacketList: TypeAlias = list[tuple[AtmoTube_GATT_UUID, AtmoTubePacket]]
 
 ALL_PACKETS = [(AtmoTube_GATT_UUID.STATUS, StatusPacket),
                (AtmoTube_GATT_UUID.SPS30, SPS30Packet),
@@ -28,11 +29,13 @@ def gatt_notify(client: BleakClient, uuid: str | AtmoTube_GATT_UUID,
                 packet_cls: AtmoTubePacket,
                 callback: Callable[[AtmoTubePacket], None]) -> Awaitable:
     if inspect.iscoroutinefunction(callback):
-        async def packet_callback(char:BleakGATTCharacteristic, data:bytearray):
+        async def packet_callback(char: BleakGATTCharacteristic,
+                                  data: bytearray):
             packet = packet_cls(data)
             await callback(packet)
     else:
-        def packet_callback(char:BleakGATTCharacteristic, data:bytearray):
+        def packet_callback(char: BleakGATTCharacteristic,
+                            data: bytearray):
             packet = packet_cls(data)
             callback(packet)
 
