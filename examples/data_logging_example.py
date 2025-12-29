@@ -6,8 +6,8 @@
 # below to match your device.
 
 from bleak import BleakClient, BleakScanner
-from atmotube import AtmoTube_GATT_UUIDs, SPS30Packet, StatusPacket
-from atmotube import BME280Packet, SGPC3Packet
+from atmotube import SPS30Packet, StatusPacket, BME280Packet, SGPC3Packet
+from atmotube import start_gatt_notifications, get_available_services
 import asyncio
 import logging
 
@@ -15,31 +15,19 @@ ATMOTUBE = "C2:2B:42:15:30:89"  # the mac address of my Atmotube
 
 
 async def collect_data(mac, queue, collection_time):
-    async def status_cb(char, data):
-        status_packet = StatusPacket(data)
-        await queue.put(status_packet)
-
-    async def sps30_cb(char, data):
-        sps30_packet = SPS30Packet(data)
-        await queue.put(sps30_packet)
-
-    async def bme280_cb(char, data):
-        bme280_packet = BME280Packet(data)
-        await queue.put(bme280_packet)
-
-    async def sgp30_cb(char, data):
-        sgp30_packet = SGPC3Packet(data)
-        await queue.put(sgp30_packet)
+    async def callback_queue(packet):
+        await queue.put(packet)
 
     device = await BleakScanner.find_device_by_address(mac)
     if not device:
         raise Exception("Device not found")
 
     async with BleakClient(device) as client:
-        await client.start_notify(AtmoTube_GATT_UUIDs.SPS30, sps30_cb)
-        await client.start_notify(AtmoTube_GATT_UUIDs.STATUS, status_cb)
-        await client.start_notify(AtmoTube_GATT_UUIDs.BME280, bme280_cb)
-        await client.start_notify(AtmoTube_GATT_UUIDs.SGPC3, sgp30_cb)
+        if not client.is_connected:
+            raise Exception("Failed to connect to device")
+        packet_list = get_available_services(client)
+        await start_gatt_notifications(client, callback_queue,
+                                       packet_list=packet_list)
         await asyncio.sleep(collection_time)
         await queue.put(None)
 
@@ -49,7 +37,8 @@ def log_packet(packet):
         case StatusPacket():
             logging.info(f"{str(packet.date_time)} - Status Packet - "
                          f"Battery: {packet.battery_level}%, "
-                         f"Charging: {packet.charging}, "
+                         f"PM Sensor: {packet.pm_sensor_status}, "
+                         f"Pre-heating: {packet.pre_heating}, "
                          f"Error: {packet.error_flag}")
         case SPS30Packet():
             logging.info(f"{str(packet.date_time)} - SPS30 Packet - "

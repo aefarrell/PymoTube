@@ -1,7 +1,7 @@
 from enum import StrEnum
 
 
-class AtmoTube_GATT_UUIDs(StrEnum):
+class AtmoTube_GATT_UUID(StrEnum):
     """UUIDs for AtmoTube Pro GATT characteristics."""
     SGPC3 = "DB450002-8E9A-4818-ADD7-6ED94A328AB4"
     BME280 = "DB450003-8E9A-4818-ADD7-6ED94A328AB4"
