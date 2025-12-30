@@ -17,6 +17,14 @@ ALL_PACKETS = [(AtmoTube_GATT_UUID.STATUS, StatusPacket),
 
 
 def get_available_services(client: BleakClient) -> PacketList:
+    """
+    Get the list of supported services on the connected Atmotube device.
+
+    :param client: The BleakClient instance of the connected Atmotube device
+    :type client: BleakClient
+    :return: A list of tuples containing the UUIDs and packet classes
+    :rtype: PacketList
+    """
     characteristics = [d.characteristic_uuid
                        for c in client.services.characteristics.values()
                        for d in c.descriptors]
@@ -28,6 +36,20 @@ def get_available_services(client: BleakClient) -> PacketList:
 def gatt_notify(client: BleakClient, uuid: str | AtmoTube_GATT_UUID,
                 packet_cls: AtmoTubePacket,
                 callback: Callable[[AtmoTubePacket], None]) -> Awaitable:
+    """
+    Start GATT notifications for a specific characteristic UUID.
+
+    :param client: The BleakClient instance of the connected Atmotube device
+    :type client: BleakClient
+    :param uuid: The UUID of the characteristic to notify
+    :type uuid: str | AtmoTube_GATT_UUID
+    :param packet_cls: The packet class to instantiate from the received data
+    :type packet_cls: AtmoTubePacket
+    :param callback: The callback function to call when a packet is received
+    :type callback: Callable[[AtmoTubePacket], None]
+    :return: An awaitable object representing the notification task
+    :rtype: Awaitable
+    """
     if inspect.iscoroutinefunction(callback):
         async def packet_callback(char: BleakGATTCharacteristic,
                                   data: bytearray):
@@ -46,5 +68,15 @@ async def start_gatt_notifications(
         client: BleakClient,
         callback: Callable[[AtmoTubePacket], None],
         packet_list: PacketList = ALL_PACKETS) -> None:
+    """
+    Start GATT notifications for all specified characteristics.
+
+    :param client: The BleakClient instance of the connected Atmotube device
+    :type client: BleakClient
+    :param callback: The callback function to call when a packet is received
+    :type callback: Callable[[AtmoTubePacket], None]
+    :param packet_list: The list of UUIDs and packet classes to notify
+    :type packet_list: PacketList
+    """
     await asyncio.gather(*[gatt_notify(client, uuid, packet_cls, callback)
                            for uuid, packet_cls in packet_list])

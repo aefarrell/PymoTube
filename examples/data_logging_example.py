@@ -7,15 +7,25 @@
 
 from bleak import BleakClient, BleakScanner
 from atmotube import SPS30Packet, StatusPacket, BME280Packet, SGPC3Packet
-from atmotube import start_gatt_notifications, get_available_services
+from atmotube import AtmoTubePacket, start_gatt_notifications
+from atmotube import get_available_services
 import asyncio
 import logging
 
-ATMOTUBE = "C2:2B:42:15:30:89"  # the mac address of my Atmotube
 
+async def collect_data(mac: str, queue: asyncio.Queue,
+                       collection_time: int) -> None:
+    """
+    Connects to the Atmotube device and collects data for a specified time.
 
-async def collect_data(mac, queue, collection_time):
-    async def callback_queue(packet):
+    :param mac: The MAC address of the Atmotube device
+    :type mac: str
+    :param queue: An asyncio Queue to put the received packets into
+    :type queue: asyncio.Queue
+    :param collection_time: The duration in seconds to collect data
+    :type collection_time: int
+    """
+    async def callback_queue(packet: AtmoTubePacket) -> None:
         await queue.put(packet)
 
     device = await BleakScanner.find_device_by_address(mac)
@@ -32,7 +42,13 @@ async def collect_data(mac, queue, collection_time):
         await queue.put(None)
 
 
-def log_packet(packet):
+def log_packet(packet: AtmoTubePacket) -> None:
+    """
+    Logs the received packet to the console.
+
+    :param packet: The packet to log
+    :type packet: AtmoTubePacket
+    """
     match packet:
         case StatusPacket():
             logging.info(f"{str(packet.date_time)} - Status Packet - "
@@ -58,12 +74,15 @@ def log_packet(packet):
             logging.info("Unknown packet type")
 
 
-def main():
-    mac = ATMOTUBE
+def main() -> None:
+    mac = "C2:2B:42:15:30:89"  # the mac address of my Atmotube
     collection_time = 60  # seconds
     queue = asyncio.Queue()
 
-    async def runner():
+    async def runner() -> None:
+        """
+        Main runner function to collect and log data.
+        """
         collector = asyncio.create_task(
             collect_data(mac, queue, collection_time)
             )
