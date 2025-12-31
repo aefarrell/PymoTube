@@ -1,5 +1,5 @@
 # PymoTube
-[![Tests](https://github.com/aefarrell/PymoTube/actions/workflows/python-package.yml/badge.svg)](https://github.com/aefarrell/PymoTube/actions/workflows/python-package.yml)
+[![LICENSE](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://github.com/aefarrell/PymoTube/blob/main/LICENSE) [![Tests](https://github.com/aefarrell/PymoTube/actions/workflows/python-package.yml/badge.svg)](https://github.com/aefarrell/PymoTube/actions/workflows/python-package.yml) [![codecov](https://codecov.io/gh/aefarrell/PymoTube/graph/badge.svg?token=E4C64QPOYH)](https://codecov.io/gh/aefarrell/PymoTube)
 
 A simple package for retrieving data from an AtmoTube via bluetooth. Very much in development.
 
