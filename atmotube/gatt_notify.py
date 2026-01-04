@@ -5,17 +5,17 @@ from typing import TypeAlias
 import asyncio
 import inspect
 
-from .uuids import AtmoTube_GATT_UUID
+from .uuids import AtmoTube_PRO_UUID
 from .packets import (
     AtmoTubePacket,
     StatusPacket, SPS30Packet, BME280Packet, SGPC3Packet)
 
-PacketList: TypeAlias = list[tuple[AtmoTube_GATT_UUID, AtmoTubePacket]]
+PacketList: TypeAlias = list[tuple[AtmoTube_PRO_UUID, AtmoTubePacket]]
 
-ALL_PACKETS = [(AtmoTube_GATT_UUID.STATUS, StatusPacket),
-               (AtmoTube_GATT_UUID.SPS30, SPS30Packet),
-               (AtmoTube_GATT_UUID.BME280, BME280Packet),
-               (AtmoTube_GATT_UUID.SGPC3, SGPC3Packet)]
+ALL_PACKETS = [(AtmoTube_PRO_UUID.STATUS, StatusPacket),
+               (AtmoTube_PRO_UUID.SPS30, SPS30Packet),
+               (AtmoTube_PRO_UUID.BME280, BME280Packet),
+               (AtmoTube_PRO_UUID.SGPC3, SGPC3Packet)]
 
 
 def get_available_services(client: BleakClient) -> PacketList:
@@ -35,7 +35,7 @@ def get_available_services(client: BleakClient) -> PacketList:
             if uuid.lower() in characteristics]
 
 
-def gatt_notify(client: BleakClient, uuid: str | AtmoTube_GATT_UUID,
+def gatt_notify(client: BleakClient, uuid: str | AtmoTube_PRO_UUID,
                 packet_cls: AtmoTubePacket,
                 callback: Callable[[AtmoTubePacket], None]) -> Awaitable:
     """
@@ -44,7 +44,7 @@ def gatt_notify(client: BleakClient, uuid: str | AtmoTube_GATT_UUID,
     :param client: The BleakClient instance of the connected Atmotube device
     :type client: BleakClient
     :param uuid: The UUID of the characteristic to notify
-    :type uuid: str | AtmoTube_GATT_UUID
+    :type uuid: str | AtmoTube_PRO_UUID
     :param packet_cls: The packet class to instantiate from the received data
     :type packet_cls: AtmoTubePacket
     :param callback: The callback function to call when a packet is received

@@ -1,9 +1,21 @@
 from enum import StrEnum
 
+class AtmoTube_Service_UUID(StrEnum):
+    """UUIDs for AtmoTube Pro services."""
+    PRO = "DB450001-8E9A-4818-ADD7-6ED94A328AB4"
+    UART = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E" # Nordic UART Service
+    DEVICE_INFO = "0000180A-0000-1000-8000-00805F9B34FB" # Generic Attribute Profile
 
-class AtmoTube_GATT_UUID(StrEnum):
+
+class AtmoTube_PRO_UUID(StrEnum):
     """UUIDs for AtmoTube Pro GATT characteristics."""
     SGPC3 = "DB450002-8E9A-4818-ADD7-6ED94A328AB4"
     BME280 = "DB450003-8E9A-4818-ADD7-6ED94A328AB4"
-    SPS30 = "DB450005-8E9A-4818-ADD7-6ED94A328AB4"
     STATUS = "DB450004-8E9A-4818-ADD7-6ED94A328AB4"
+    SPS30 = "DB450005-8E9A-4818-ADD7-6ED94A328AB4"
+
+
+class AtmoTube_UART_UUID(StrEnum):
+    """UUIDs for AtmoTube Pro UART characteristics."""
+    TX = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
+    RX = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
