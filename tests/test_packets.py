@@ -18,16 +18,20 @@ status_packet_str = (f"StatusPacket(date_time={str(datetime_obj)}, "
 
 
 def test_status_packet():
-    packet = StatusPacket(status_test_byte, date_time=datetime_obj)
-    assert packet.pm_sensor_status is True
-    assert packet.error_flag is False
-    assert packet.bonding_flag is False
-    assert packet.charging is False
-    assert packet.charging_timer is False
-    assert packet.pre_heating is True
-    assert packet.battery_level == 100
-    assert str(packet) == status_packet_str
-    assert repr(packet) == status_packet_str
+    p1 = StatusPacket(status_test_byte, date_time=datetime_obj)
+    p2 = StatusPacket(status_test_byte, date_time=datetime_obj)
+    p3 = StatusPacket(bytearray(b'Ac'), date_time=datetime_obj)
+    assert p1 == p2
+    assert p1 != p3
+    assert p1.pm_sensor_status is True
+    assert p1.error_flag is False
+    assert p1.bonding_flag is False
+    assert p1.charging is False
+    assert p1.charging_timer is False
+    assert p1.pre_heating is True
+    assert p1.battery_level == 100
+    assert str(p1) == status_packet_str
+    assert repr(p1) == status_packet_str
     with pytest.raises(InvalidByteData):
         StatusPacket(status_test_invalid_byte, date_time=datetime_obj)
 
@@ -41,13 +45,18 @@ sps30_test_str = (f"SPS30Packet(date_time={str(datetime_obj)}, "
 
 
 def test_sps30_packet():
-    packet = SPS30Packet(sps30_test_byte, date_time=datetime_obj)
-    assert packet.pm1 == 1.0
-    assert packet.pm2_5 == 1.85
-    assert packet.pm10 == 3.3
-    assert packet.pm4 == 1.11
-    assert str(packet) == sps30_test_str
-    assert repr(packet) == sps30_test_str
+    p1 = SPS30Packet(sps30_test_byte, date_time=datetime_obj)
+    p2 = SPS30Packet(sps30_test_byte, date_time=datetime_obj)
+    p3 = SPS30Packet(bytearray(b'e\x00\x00\xb9\x00\x00J\x01\x00o\x00\x00'),
+                     date_time=datetime_obj)
+    assert p1 == p2
+    assert p1 != p3
+    assert p1.pm1 == 1.0
+    assert p1.pm2_5 == 1.85
+    assert p1.pm10 == 3.3
+    assert p1.pm4 == 1.11
+    assert str(p1) == sps30_test_str
+    assert repr(p1) == sps30_test_str
     with pytest.raises(InvalidByteData):
         SPS30Packet(sps30_test_invalid_byte, date_time=datetime_obj)
 
@@ -61,12 +70,17 @@ bme280_test_str = (f"BME280Packet(date_time={str(datetime_obj)}, "
 
 
 def test_bme280_packet():
-    packet = BME280Packet(bme280_test_byte, date_time=datetime_obj)
-    assert packet.humidity == 14
-    assert packet.temperature == 23.3
-    assert packet.pressure == 940.9
-    assert str(packet) == bme280_test_str
-    assert repr(packet) == bme280_test_str
+    p1 = BME280Packet(bme280_test_byte, date_time=datetime_obj)
+    p2 = BME280Packet(bme280_test_byte, date_time=datetime_obj)
+    p3 = BME280Packet(bytearray(b'\x0e\x17\x8ao\x01\x00\x1a\x0a'),
+                     date_time=datetime_obj)
+    assert p1 == p2
+    assert p1 != p3
+    assert p1.humidity == 14
+    assert p1.temperature == 23.3
+    assert p1.pressure == 940.9
+    assert str(p1) == bme280_test_str
+    assert repr(p1) == bme280_test_str
     with pytest.raises(InvalidByteData):
         BME280Packet(bme280_test_invalid_byte, date_time=datetime_obj)
 
@@ -79,9 +93,14 @@ sgpc3_test_str = (f"SGPC3Packet(date_time={str(datetime_obj)}, "
 
 
 def test_sgpc3_packet():
-    packet = SGPC3Packet(sgpc3_test_byte, date_time=datetime_obj)
-    assert packet.tvoc == 0.002
-    assert str(packet) == sgpc3_test_str
-    assert repr(packet) == sgpc3_test_str
+    p1 = SGPC3Packet(sgpc3_test_byte, date_time=datetime_obj)
+    p2 = SGPC3Packet(sgpc3_test_byte, date_time=datetime_obj)
+    p3 = SGPC3Packet(bytearray(b'\x03\x00\x00\x00'),
+                     date_time=datetime_obj)
+    assert p1 == p2
+    assert p1 != p3
+    assert p1.tvoc == 0.002
+    assert str(p1) == sgpc3_test_str
+    assert repr(p1) == sgpc3_test_str
     with pytest.raises(InvalidByteData):
         SGPC3Packet(sgpc3_test_invalid_byte, date_time=datetime_obj)

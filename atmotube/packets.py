@@ -35,6 +35,10 @@ class AtmoTubePacket(LittleEndianStructure):
 
     def __repr__(self) -> str:
         return str(self)
+    
+    @abstractmethod
+    def __eq__(self, other: object) -> bool:
+        ...
 
     @abstractmethod
     def __str__(self) -> str:
@@ -81,6 +85,19 @@ class StatusPacket(AtmoTubePacket):
                 f"charging_timer={self.charging_timer}, "
                 f"pre_heating={self.pre_heating}, "
                 f"battery_level={self.battery_level}%)")
+    
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, StatusPacket):
+            return all((self.date_time == other.date_time,
+                    self.pm_sensor_status == other.pm_sensor_status,
+                    self.error_flag == other.error_flag,
+                    self.bonding_flag == other.bonding_flag,
+                    self.charging == other.charging,
+                    self.charging_timer == other.charging_timer,
+                    self.pre_heating == other.pre_heating,
+                    self.battery_level == other.battery_level))
+        else:
+            return False
 
 
 class SPS30Packet(AtmoTubePacket):
@@ -113,6 +130,16 @@ class SPS30Packet(AtmoTubePacket):
         return (f"SPS30Packet(date_time={str(self.date_time)}, "
                 f"pm1={self.pm1}µg/m³, pm2_5={self.pm2_5}µg/m³, "
                 f"pm10={self.pm10}µg/m³, pm4={self.pm4}µg/m³)")
+    
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, SPS30Packet):
+            return all((self.date_time == other.date_time,
+                    self.pm1 == other.pm1,
+                    self.pm2_5 == other.pm2_5,
+                    self.pm10 == other.pm10,
+                    self.pm4 == other.pm4))
+        else:
+            return False
 
 
 class BME280Packet(AtmoTubePacket):
@@ -141,6 +168,15 @@ class BME280Packet(AtmoTubePacket):
                 f"humidity={self.humidity}%, "
                 f"temperature={self.temperature}°C, "
                 f"pressure={self.pressure}mbar)")
+    
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, BME280Packet):
+            return all((self.date_time == other.date_time,
+                    self.humidity == other.humidity,
+                    self.temperature == other.temperature,
+                    self.pressure == other.pressure))
+        else:
+            return False
 
 
 class SGPC3Packet(AtmoTubePacket):
@@ -162,3 +198,10 @@ class SGPC3Packet(AtmoTubePacket):
     def __str__(self) -> str:
         return (f"SGPC3Packet(date_time={str(self.date_time)}, "
                 f"tvoc={self.tvoc}ppb)")
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, SGPC3Packet):
+            return all((self.date_time == other.date_time,
+                    self.tvoc == other.tvoc))
+        else:
+            return False
