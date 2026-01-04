@@ -1,12 +1,14 @@
-from .uuids import AtmoTube_GATT_UUID
-from .packets import AtmoTubePacket
-from .packets import StatusPacket, SPS30Packet, BME280Packet, SGPC3Packet
 from bleak import BleakClient, BleakGATTCharacteristic
 from collections.abc import Callable, Awaitable
 from typing import TypeAlias
 
 import asyncio
 import inspect
+
+from .uuids import AtmoTube_GATT_UUID
+from .packets import (
+    AtmoTubePacket,
+    StatusPacket, SPS30Packet, BME280Packet, SGPC3Packet)
 
 PacketList: TypeAlias = list[tuple[AtmoTube_GATT_UUID, AtmoTubePacket]]
 

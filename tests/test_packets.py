@@ -1,5 +1,7 @@
-from atmotube import InvalidByteData
-from atmotube import StatusPacket, SPS30Packet, BME280Packet, SGPC3Packet
+from atmotube import (
+    InvalidByteData,
+    StatusPacket, SPS30Packet, BME280Packet, SGPC3Packet
+)
 from datetime import datetime
 
 import pytest

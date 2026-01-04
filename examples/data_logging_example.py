@@ -6,9 +6,12 @@
 # below to match your device.
 
 from bleak import BleakClient, BleakScanner
-from atmotube import SPS30Packet, StatusPacket, BME280Packet, SGPC3Packet
-from atmotube import AtmoTubePacket, start_gatt_notifications
-from atmotube import get_available_services
+from atmotube import (
+    AtmoTubePacket,
+    SPS30Packet, StatusPacket, BME280Packet, SGPC3Packet,
+    start_gatt_notifications, get_available_services
+    )
+
 import asyncio
 import logging
 
