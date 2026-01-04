@@ -14,7 +14,7 @@ import pytest
 datetime_obj = datetime(2024, 1, 1, 12, 0, 0)
 status_test_byte = bytearray(b'Ad')
 status_test_invalid_byte = bytearray(b'A')
-status_packet_str = (f"StatusPacket(date_time={str(datetime_obj)}, "
+status_packet_str = (f"AtmotubeProStatus(date_time={str(datetime_obj)}, "
                      f"pm_sensor_status=True, "
                      f"error_flag=False, bonding_flag=False, "
                      f"charging=False, charging_timer=False, "
@@ -43,7 +43,7 @@ def test_status_packet():
 # SPS30 Packet tests
 sps30_test_byte = bytearray(b'd\x00\x00\xb9\x00\x00J\x01\x00o\x00\x00')
 sps30_test_invalid_byte = bytearray(b'd\x00\x00\xb9\x00\x00J\x01')
-sps30_test_str = (f"SPS30Packet(date_time={str(datetime_obj)}, "
+sps30_test_str = (f"AtmotubeProSPS30(date_time={str(datetime_obj)}, "
                   f"pm1=1.0µg/m³, pm2_5=1.85µg/m³, "
                   f"pm10=3.3µg/m³, pm4=1.11µg/m³)")
 
@@ -68,7 +68,7 @@ def test_sps30_packet():
 # BME280 Packet tests
 bme280_test_byte = bytearray(b'\x0e\x17\x8ao\x01\x00\x1a\t')
 bme280_test_invalid_byte = bytearray(b'\x0e\x17\x8ao\x01')
-bme280_test_str = (f"BME280Packet(date_time={str(datetime_obj)}, "
+bme280_test_str = (f"AtmotubeProBME280(date_time={str(datetime_obj)}, "
                    f"humidity=14%, temperature=23.3°C, "
                    f"pressure=940.9mbar)")
 
@@ -91,7 +91,7 @@ def test_bme280_packet():
 # SGPC3 Packet tests
 sgpc3_test_byte = bytearray(b'\x02\x00\x00\x00')
 sgpc3_test_invalid_byte = bytearray(b'\x02\x00\x00')
-sgpc3_test_str = (f"SGPC3Packet(date_time={str(datetime_obj)}, "
+sgpc3_test_str = (f"AtmotubeProSGPC3(date_time={str(datetime_obj)}, "
                   f"tvoc=0.002ppb)")
 
 

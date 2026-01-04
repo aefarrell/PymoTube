@@ -16,6 +16,15 @@ async def get_client(mac):
     return client
 
 
+async def collect_broadcast_data(mac, queue, collection_time):
+    async def callback(device, advertising_data):
+        if device.address.upper() == mac.upper():
+            await queue.put((device, advertising_data))
+
+    async with BleakScanner(callback):
+        await asyncio.sleep(collection_time)
+        await queue.put(None)
+
 async def collect_data(mac, queue, collection_time):
     async def status_cb(char, data):
         await queue.put(("status byte", data))
@@ -43,24 +52,25 @@ async def collect_data(mac, queue, collection_time):
         await asyncio.sleep(collection_time)
         await queue.put(None)
 
+async def runner(mac, queue, collection_time, collector):
+    task = asyncio.create_task(
+        collector(mac, queue, collection_time)
+        )
+    while True:
+        item = await queue.get()
+        if item is None:
+            break
+        device, adv_data = item
+        #print(f"Received: {item[0]}, Data: {item[1]}")
+        print(f"{device.name}")
+    await task
 
 def main():
     mac = ATMOTUBE
-    collection_time = 10  # seconds
+    collection_time = 60  # seconds
     queue = asyncio.Queue()
-
-    async def runner():
-        collector = asyncio.create_task(
-            collect_data(mac, queue, collection_time)
-            )
-        while True:
-            item = await queue.get()
-            if item is None:
-                break
-            print(f"Received: {item[0]}, Data: {item[1]}")
-        await collector
-
-    asyncio.run(runner())
+    collector = collect_broadcast_data
+    asyncio.run(runner(mac, queue, collection_time, collector))
 
 
 if __name__ == "__main__":

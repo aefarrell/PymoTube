@@ -7,10 +7,10 @@ import inspect
 
 from .uuids import AtmotubeProService_UUID, AtmotubeProGATT_UUID
 from .packets import (
-    AtmotubePacket,
+    AtmotubeGATTPacket,
     AtmotubeProStatus, AtmotubeProSPS30, AtmotubeProBME280, AtmotubeProSGPC3)
 
-PacketList: TypeAlias = list[tuple[AtmotubeProGATT_UUID, AtmotubePacket]]
+PacketList: TypeAlias = list[tuple[AtmotubeProGATT_UUID, AtmotubeGATTPacket]]
 
 ATMOTUBE_PRO_PACKETS = {AtmotubeProGATT_UUID.STATUS: AtmotubeProStatus,
                         AtmotubeProGATT_UUID.SPS30: AtmotubeProSPS30,
@@ -42,8 +42,8 @@ def get_available_characteristics(client: BleakClient) -> PacketList:
 
 
 def gatt_notify(client: BleakClient, uuid: str | AtmotubeProGATT_UUID,
-                packet_cls: AtmotubePacket,
-                callback: Callable[[AtmotubePacket], None]) -> Awaitable:
+                packet_cls: AtmotubeGATTPacket,
+                callback: Callable[[AtmotubeGATTPacket], None]) -> Awaitable:
     """
     Start GATT notifications for a specific characteristic UUID.
 
@@ -52,9 +52,9 @@ def gatt_notify(client: BleakClient, uuid: str | AtmotubeProGATT_UUID,
     :param uuid: The UUID of the characteristic to notify
     :type uuid: str | AtmotubeProGATT_UUID
     :param packet_cls: The packet class to instantiate from the received data
-    :type packet_cls: AtmotubePacket
+    :type packet_cls: AtmotubeGATTPacket
     :param callback: The callback function to call when a packet is received
-    :type callback: Callable[[AtmotubePacket], None]
+    :type callback: Callable[[AtmotubeGATTPacket], None]
     :return: An awaitable object representing the notification task
     :rtype: Awaitable
     """
@@ -74,7 +74,7 @@ def gatt_notify(client: BleakClient, uuid: str | AtmotubeProGATT_UUID,
 
 async def start_gatt_notifications(
         client: BleakClient,
-        callback: Callable[[AtmotubePacket], None],
+        callback: Callable[[AtmotubeGATTPacket], None],
         packet_list: PacketList = list(ATMOTUBE_PRO_PACKETS.items())) -> None:
     """
     Start GATT notifications for all specified characteristics.
@@ -82,7 +82,7 @@ async def start_gatt_notifications(
     :param client: The BleakClient instance of the connected Atmotube device
     :type client: BleakClient
     :param callback: The callback function to call when a packet is received
-    :type callback: Callable[[AtmoTubePacket], None]
+    :type callback: Callable[[AtmotubeGATTPacket], None]
     :param packet_list: The list of UUIDs and packet classes to notify
     :type packet_list: PacketList
     """

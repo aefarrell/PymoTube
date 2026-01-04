@@ -7,7 +7,7 @@
 
 from bleak import BleakClient, BleakScanner
 from atmotube import (
-    AtmotubePacket,
+    AtmotubeGATTPacket,
     AtmotubeProSPS30, AtmotubeProStatus, AtmotubeProBME280, AtmotubeProSGPC3,
     start_gatt_notifications, get_available_characteristics
     )
@@ -28,7 +28,7 @@ async def collect_data(mac: str, queue: asyncio.Queue,
     :param collection_time: The duration in seconds to collect data
     :type collection_time: int
     """
-    async def callback_queue(packet: AtmotubePacket) -> None:
+    async def callback_queue(packet: AtmotubeGATTPacket) -> None:
         await queue.put(packet)
 
     device = await BleakScanner.find_device_by_address(mac)
@@ -45,12 +45,12 @@ async def collect_data(mac: str, queue: asyncio.Queue,
         await queue.put(None)
 
 
-def log_packet(packet: AtmotubePacket) -> None:
+def log_packet(packet: AtmotubeGATTPacket) -> None:
     """
     Logs the received packet to the console.
 
     :param packet: The packet to log
-    :type packet: AtmoTubePacket
+    :type packet: AtmotubeGATTPacket
     """
     match packet:
         case AtmotubeProStatus():
