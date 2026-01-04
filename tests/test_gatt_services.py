@@ -42,7 +42,8 @@ def test_get_available_characteristics_all():
     packet_list = get_available_characteristics(client)
 
     # Assertions
-    assert packet_list == ALL_PACKETS
+    assert len(packet_list) == len(ALL_PACKETS)
+    assert set(packet_list) == set(ALL_PACKETS)
 
 
 def test_get_available_characteristics_no_pm():
@@ -58,10 +59,48 @@ def test_get_available_characteristics_no_pm():
 
     # Call the function
     packet_list = get_available_characteristics(client)
+    expected_packet_list = [(uuid, packet_cls) for uuid, packet_cls in ALL_PACKETS
+                           if uuid != AtmoTube_PRO_UUID.SPS30]
 
     # Assertions
-    assert packet_list == [packet for packet in ALL_PACKETS
-                           if packet[0] != AtmoTube_PRO_UUID.SPS30]
+    assert len(packet_list) == len(expected_packet_list)
+    assert set(packet_list) == set(expected_packet_list)
+    
+
+def test_get_available_characteristics_empty():
+    client = Mock(spec=BleakClient)
+    client.services.get_service.return_value = Mock(
+        uuid=AtmoTube_Service_UUID.PRO,
+        characteristics=[]
+    )
+
+    # Call the function
+    packet_list = get_available_characteristics(client)
+
+    # Assertions
+    assert packet_list == []
+
+
+def test_get_available_characteristics_extra():
+    client = Mock(spec=BleakClient)
+    client.services.get_service.return_value = Mock(
+        uuid=AtmoTube_Service_UUID.PRO,
+        characteristics=[
+            Mock(uuid=AtmoTube_PRO_UUID.SGPC3),
+            Mock(uuid=AtmoTube_PRO_UUID.BME280),
+            Mock(uuid=AtmoTube_PRO_UUID.STATUS),
+            Mock(uuid="00001234-0000-1000-8000-00805f9b34fb"),  # Extra UUID
+        ]
+    )
+
+    # Call the function
+    packet_list = get_available_characteristics(client)
+    expected_packet_list = [(uuid, packet_cls) for uuid, packet_cls in ALL_PACKETS
+                            if uuid != AtmoTube_PRO_UUID.SPS30]
+
+    # Assertions
+    assert len(packet_list) == len(expected_packet_list)
+    assert set(packet_list) == set(expected_packet_list)
 
 
 def test_get_available_characteristics_invalid_service():
