@@ -1,9 +1,9 @@
 # PymoTube
 [![LICENSE](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://github.com/aefarrell/PymoTube/blob/main/LICENSE) [![Tests](https://github.com/aefarrell/PymoTube/actions/workflows/python-package.yml/badge.svg)](https://github.com/aefarrell/PymoTube/actions/workflows/python-package.yml) [![codecov](https://codecov.io/gh/aefarrell/PymoTube/graph/badge.svg?token=E4C64QPOYH)](https://codecov.io/gh/aefarrell/PymoTube)
 
-A simple package for retrieving data from an AtmoTube via bluetooth. Very much in development.
+A simple package for retrieving data from an AtmoTube PRO via [bluetooth](https://support.atmotube.com/en/articles/10364981-bluetooth-api#h_150b16091e). Very much in development.
 
-Currently it is just a set of helper classes for taking bytearrays returned by the AtmoTube and turning it into a basic struct.
+Currently it is just a set of helper classes for taking bytearrays returned by an AtmoTube PRO and turning it into a basic struct.
 
 ## Packets
 
