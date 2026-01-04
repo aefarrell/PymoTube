@@ -1,6 +1,8 @@
 import pytest
+import logging
 from unittest.mock import ANY, AsyncMock, Mock
 from bleak import BleakClient
+from bleak.exc import BleakCharacteristicNotFoundError
 
 from atmotube import (
     AtmoTube_Service_UUID,
@@ -11,12 +13,18 @@ from atmotube import (
     SGPC3Packet,
     InvalidAtmoTubeService,
     get_available_characteristics,
-    gatt_notify)
+    gatt_notify,
+    start_gatt_notifications)
 
 ALL_PACKETS = [(AtmoTube_PRO_UUID.STATUS, StatusPacket),
                (AtmoTube_PRO_UUID.SPS30, SPS30Packet),
                (AtmoTube_PRO_UUID.BME280, BME280Packet),
                (AtmoTube_PRO_UUID.SGPC3, SGPC3Packet)]
+
+TEST_PACKETS = [(AtmoTube_PRO_UUID.STATUS, bytearray(b'Ad')),
+                (AtmoTube_PRO_UUID.SPS30, bytearray(b'd\x00\x00\xb9\x00\x00J\x01\x00o\x00\x00')),
+                (AtmoTube_PRO_UUID.BME280, bytearray(b'\x0e\x17\x8ao\x01\x00\x1a\t')),
+                (AtmoTube_PRO_UUID.SGPC3, bytearray(b'\x02\x00\x00\x00'))]
 
 
 def test_get_available_characteristics_all():
@@ -60,15 +68,8 @@ def test_get_available_characteristics_no_pm():
 def test_get_available_characteristics_invalid_service():
     client = Mock(spec=BleakClient)
     client.services.get_service.return_value = None
-
-    # Call the function and expect an exception
-    try:
+    with pytest.raises(InvalidAtmoTubeService):
         get_available_characteristics(client)
-    except Exception as e:
-        assert isinstance(e, InvalidAtmoTubeService)
-        assert str(e) == "AtmoTube Pro service not found"
-    else:
-        assert False, "Expected exception was not raised"
 
 
 class MockPacket:
@@ -83,8 +84,7 @@ async def test_gatt_notify_async_callback():
     callback = AsyncMock()
 
     # Call gatt_notify, and await the returned task
-    task = gatt_notify(client, uuid, MockPacket, callback)
-    await task
+    await gatt_notify(client, uuid, MockPacket, callback)
 
     # Assert that start_notify was called with the uuid and something tbd
     client.start_notify.assert_called_once_with(uuid, ANY)
@@ -100,3 +100,66 @@ async def test_gatt_notify_async_callback():
     callback.assert_called_once_with(ANY)
     assert isinstance(callback.call_args.args[0], MockPacket)
     assert callback.call_args.args[0].data == notification_data
+
+
+@pytest.mark.asyncio
+async def test_gatt_notify_concurrent_callback():
+    uuid = "example-uuid"
+    client = AsyncMock(spec=BleakClient)
+    callback = Mock()
+
+    # Call gatt_notify, and await the returned task
+    await gatt_notify(client, uuid, MockPacket, callback)
+
+    # Assert that start_notify was called with the uuid and something tbd
+    client.start_notify.assert_called_once_with(uuid, ANY)
+
+    # Dummy notification being sent
+    packet_callback = client.start_notify.call_args[0][1]
+    notification_data = bytearray([0, 1, 2, 3])
+    packet_callback(None, notification_data)
+
+    # Assert that the original callback is called with one argument
+    # and that argument is of the correct instance and holds the data
+    callback.assert_called_once_with(ANY)
+    assert isinstance(callback.call_args.args[0], MockPacket)
+    assert callback.call_args.args[0].data == notification_data
+
+@pytest.mark.asyncio
+async def test_gatt_notify_start_notify_failure():
+    uuid = '00001234-0000-1000-8000-00805f9b34fb'
+    client = AsyncMock(spec=BleakClient)
+    client.start_notify.side_effect = BleakCharacteristicNotFoundError(f"Characteristic {uuid} was not found!")
+    callback = Mock()
+
+    # Call gatt_notify, and await the returned task
+    with pytest.raises(BleakCharacteristicNotFoundError):
+        await gatt_notify(client, uuid, MockPacket, callback)
+
+
+@pytest.mark.asyncio
+async def test_start_gatt_notifications():
+    client = AsyncMock(spec=BleakClient)
+    callback = Mock()
+
+    packet_list = [(uuid, MockPacket) for uuid, _ in ALL_PACKETS]
+
+    # Call start_gatt_notifications, and await the returned task
+    await start_gatt_notifications(client, callback, packet_list)
+
+    # Assert that start_notify was called with the correct UUIDs
+    for call in client.start_notify.mock_calls:
+        uuid, _ = call.args
+        assert uuid in [packet[0] for packet in ALL_PACKETS]
+    
+    # Dummy notifications being sent
+    for call in client.start_notify.mock_calls:
+        uuid, packet_callback = call.args
+        _, byte_data = list(filter(lambda x: x[0]==uuid, TEST_PACKETS))[0]
+        packet_callback(None, byte_data)
+    
+    # Assert that the original callback is called with correct packets
+    for call in callback.mock_calls:
+        packet = call.args[0]
+        assert isinstance(packet, MockPacket)
+        assert packet.data in [data for _, data in TEST_PACKETS]

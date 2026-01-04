@@ -1,13 +1,19 @@
-# This is a simple script to open a connection to an Atmotube device,
-# collect data for a specified duration, and print the received data packets.
-# Convenient for generating byte arrays for testing.
+# Some simple functions for connecting to an Atmotube Pro for testing purposes
 
 import asyncio
 from bleak import BleakClient, BleakScanner
-from atmotube import AtmoTube_GATT_UUIDs
+from atmotube import AtmoTube_PRO_UUID
 
 ATMOTUBE = "C2:2B:42:15:30:89"  # the mac address of my Atmotube
 
+async def get_client(mac):
+    device = await BleakScanner.find_device_by_address(mac)
+    if not device:
+        raise Exception("Device not found")
+
+    client = BleakClient(device)
+    await client.connect()
+    return client
 
 async def collect_data(mac, queue, collection_time):
     async def status_cb(char, data):
@@ -27,10 +33,10 @@ async def collect_data(mac, queue, collection_time):
         raise Exception("Device not found")
 
     async with BleakClient(device) as client:
-        await client.start_notify(AtmoTube_GATT_UUIDs.SPS30, sps30_cb)
-        await client.start_notify(AtmoTube_GATT_UUIDs.STATUS, status_cb)
-        await client.start_notify(AtmoTube_GATT_UUIDs.BME280, bme280_cb)
-        await client.start_notify(AtmoTube_GATT_UUIDs.SGPC3, sgp30_cb)
+        asyncio.gather(*[client.start_notify(AtmoTube_PRO_UUID.SPS30, sps30_cb),
+        client.start_notify(AtmoTube_PRO_UUID.STATUS, status_cb),
+        client.start_notify(AtmoTube_PRO_UUID.BME280, bme280_cb),
+        client.start_notify(AtmoTube_PRO_UUID.SGPC3, sgp30_cb)])
         await asyncio.sleep(collection_time)
         await queue.put(None)
 
