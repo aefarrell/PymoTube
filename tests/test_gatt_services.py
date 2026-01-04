@@ -1,5 +1,4 @@
 import pytest
-import logging
 from unittest.mock import ANY, AsyncMock, Mock
 from bleak import BleakClient
 from bleak.exc import BleakCharacteristicNotFoundError
@@ -21,10 +20,10 @@ ALL_PACKETS = [(AtmoTube_PRO_UUID.STATUS, StatusPacket),
                (AtmoTube_PRO_UUID.BME280, BME280Packet),
                (AtmoTube_PRO_UUID.SGPC3, SGPC3Packet)]
 
-TEST_PACKETS = [(AtmoTube_PRO_UUID.STATUS, bytearray(b'Ad')),
-                (AtmoTube_PRO_UUID.SPS30, bytearray(b'd\x00\x00\xb9\x00\x00J\x01\x00o\x00\x00')),
-                (AtmoTube_PRO_UUID.BME280, bytearray(b'\x0e\x17\x8ao\x01\x00\x1a\t')),
-                (AtmoTube_PRO_UUID.SGPC3, bytearray(b'\x02\x00\x00\x00'))]
+TEST_PACKETS = {AtmoTube_PRO_UUID.STATUS: bytearray(b'Ad'),
+                AtmoTube_PRO_UUID.SPS30: bytearray(b'd\x00\x00\xb9\x00\x00J\x01\x00o\x00\x00'),
+                AtmoTube_PRO_UUID.BME280: bytearray(b'\x0e\x17\x8ao\x01\x00\x1a\t'),
+                AtmoTube_PRO_UUID.SGPC3: bytearray(b'\x02\x00\x00\x00')}
 
 
 def test_get_available_characteristics_all():
@@ -125,6 +124,7 @@ async def test_gatt_notify_concurrent_callback():
     assert isinstance(callback.call_args.args[0], MockPacket)
     assert callback.call_args.args[0].data == notification_data
 
+
 @pytest.mark.asyncio
 async def test_gatt_notify_start_notify_failure():
     uuid = '00001234-0000-1000-8000-00805f9b34fb'
@@ -151,15 +151,15 @@ async def test_start_gatt_notifications():
     for call in client.start_notify.mock_calls:
         uuid, _ = call.args
         assert uuid in [packet[0] for packet in ALL_PACKETS]
-    
+
     # Dummy notifications being sent
     for call in client.start_notify.mock_calls:
         uuid, packet_callback = call.args
-        _, byte_data = list(filter(lambda x: x[0]==uuid, TEST_PACKETS))[0]
-        packet_callback(None, byte_data)
-    
+        byte_data = TEST_PACKETS[uuid]
+        packet_callback(None, (uuid, byte_data))
+
     # Assert that the original callback is called with correct packets
     for call in callback.mock_calls:
         packet = call.args[0]
         assert isinstance(packet, MockPacket)
-        assert packet.data in [data for _, data in TEST_PACKETS]
+        assert packet.data[1] == TEST_PACKETS[packet.data[0]]
