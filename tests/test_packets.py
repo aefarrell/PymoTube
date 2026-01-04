@@ -73,7 +73,7 @@ def test_bme280_packet():
     p1 = BME280Packet(bme280_test_byte, date_time=datetime_obj)
     p2 = BME280Packet(bme280_test_byte, date_time=datetime_obj)
     p3 = BME280Packet(bytearray(b'\x0e\x17\x8ao\x01\x00\x1a\x0a'),
-                     date_time=datetime_obj)
+                      date_time=datetime_obj)
     assert p1 == p2
     assert p1 != p3
     assert p1.humidity == 14
@@ -104,3 +104,17 @@ def test_sgpc3_packet():
     assert repr(p1) == sgpc3_test_str
     with pytest.raises(InvalidByteData):
         SGPC3Packet(sgpc3_test_invalid_byte, date_time=datetime_obj)
+
+
+def test_packet_inequality():
+    status_packet = StatusPacket(status_test_byte, date_time=datetime_obj)
+    sps30_packet = SPS30Packet(sps30_test_byte, date_time=datetime_obj)
+    bme280_packet = BME280Packet(bme280_test_byte, date_time=datetime_obj)
+    sgpc3_packet = SGPC3Packet(sgpc3_test_byte, date_time=datetime_obj)
+
+    assert status_packet != sps30_packet
+    assert status_packet != bme280_packet
+    assert status_packet != sgpc3_packet
+    assert sps30_packet != bme280_packet
+    assert sps30_packet != sgpc3_packet
+    assert bme280_packet != sgpc3_packet

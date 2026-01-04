@@ -59,13 +59,14 @@ def test_get_available_characteristics_no_pm():
 
     # Call the function
     packet_list = get_available_characteristics(client)
-    expected_packet_list = [(uuid, packet_cls) for uuid, packet_cls in ALL_PACKETS
-                           if uuid != AtmoTube_PRO_UUID.SPS30]
+    expected_packet_list = [(uuid, packet_cls)
+                            for uuid, packet_cls in ALL_PACKETS
+                            if uuid != AtmoTube_PRO_UUID.SPS30]
 
     # Assertions
     assert len(packet_list) == len(expected_packet_list)
     assert set(packet_list) == set(expected_packet_list)
-    
+
 
 def test_get_available_characteristics_empty():
     client = Mock(spec=BleakClient)
@@ -95,7 +96,8 @@ def test_get_available_characteristics_extra():
 
     # Call the function
     packet_list = get_available_characteristics(client)
-    expected_packet_list = [(uuid, packet_cls) for uuid, packet_cls in ALL_PACKETS
+    expected_packet_list = [(uuid, packet_cls)
+                            for uuid, packet_cls in ALL_PACKETS
                             if uuid != AtmoTube_PRO_UUID.SPS30]
 
     # Assertions
