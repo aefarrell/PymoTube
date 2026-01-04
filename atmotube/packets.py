@@ -14,7 +14,7 @@ class InvalidByteData(Exception):
 # LittleEndianStructure so be mindful that this class is intended to be
 # abstract. It is only exposed to the user to use as a type hint for
 # functions that accept any Atmotube packet.
-class AtmoTubePacket(LittleEndianStructure):
+class AtmotubePacket(LittleEndianStructure):
     """
     Abstract base class for Atmotube data packets.
     """
@@ -49,7 +49,7 @@ class AtmoTubePacket(LittleEndianStructure):
         ...
 
 
-class StatusPacket(AtmoTubePacket):
+class AtmotubeProStatus(AtmotubePacket):
     """
     Represents the status packet from an Atmotube device.
     """
@@ -87,7 +87,7 @@ class StatusPacket(AtmoTubePacket):
                 f"battery_level={self.battery_level}%)")
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, StatusPacket):
+        if isinstance(other, AtmotubeProStatus):
             return all((self.date_time == other.date_time,
                         self.pm_sensor_status == other.pm_sensor_status,
                         self.error_flag == other.error_flag,
@@ -100,7 +100,7 @@ class StatusPacket(AtmoTubePacket):
             return False
 
 
-class SPS30Packet(AtmoTubePacket):
+class AtmotubeProSPS30(AtmotubePacket):
     """
     Represents the SPS30 particulate matter sensor data packet from an
     Atmotube device.
@@ -132,7 +132,7 @@ class SPS30Packet(AtmoTubePacket):
                 f"pm10={self.pm10}µg/m³, pm4={self.pm4}µg/m³)")
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, SPS30Packet):
+        if isinstance(other, AtmotubeProSPS30):
             return all((self.date_time == other.date_time,
                         self.pm1 == other.pm1,
                         self.pm2_5 == other.pm2_5,
@@ -142,7 +142,7 @@ class SPS30Packet(AtmoTubePacket):
             return False
 
 
-class BME280Packet(AtmoTubePacket):
+class AtmotubeProBME280(AtmotubePacket):
     """
     Represents the BME280 environmental sensor data packet from an
     Atmotube device.
@@ -170,7 +170,7 @@ class BME280Packet(AtmoTubePacket):
                 f"pressure={self.pressure}mbar)")
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, BME280Packet):
+        if isinstance(other, AtmotubeProBME280):
             return all((self.date_time == other.date_time,
                         self.humidity == other.humidity,
                         self.temperature == other.temperature,
@@ -179,7 +179,7 @@ class BME280Packet(AtmoTubePacket):
             return False
 
 
-class SGPC3Packet(AtmoTubePacket):
+class AtmotubeProSGPC3(AtmotubePacket):
     """
     Represents the SGPC3 air quality sensor data packet from an
     Atmotube device.
@@ -200,7 +200,7 @@ class SGPC3Packet(AtmoTubePacket):
                 f"tvoc={self.tvoc}ppb)")
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, SGPC3Packet):
+        if isinstance(other, AtmotubeProSGPC3):
             return all((self.date_time == other.date_time,
                         self.tvoc == other.tvoc))
         else:

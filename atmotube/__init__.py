@@ -1,16 +1,16 @@
-from .gatt import (InvalidAtmoTubeService,
+from .gatt import (InvalidAtmotubeService,
                    gatt_notify,
                    start_gatt_notifications,
                    get_available_characteristics)
 from .packets import (InvalidByteData,
-                      AtmoTubePacket,
-                      StatusPacket,
-                      SPS30Packet,
-                      BME280Packet,
-                      SGPC3Packet)
-from .uuids import (AtmoTube_Service_UUID,
-                    AtmoTube_PRO_UUID,
-                    AtmoTube_UART_UUID)
+                      AtmotubePacket,
+                      AtmotubeProStatus,
+                      AtmotubeProSPS30,
+                      AtmotubeProBME280,
+                      AtmotubeProSGPC3)
+from .uuids import (AtmotubeProService_UUID,
+                    AtmotubeProGATT_UUID,
+                    AtmotubeProUART_UUID)
 
 
 __version__ = "0.0.1"

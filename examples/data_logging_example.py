@@ -7,8 +7,8 @@
 
 from bleak import BleakClient, BleakScanner
 from atmotube import (
-    AtmoTubePacket,
-    SPS30Packet, StatusPacket, BME280Packet, SGPC3Packet,
+    AtmotubePacket,
+    AtmotubeProSPS30, AtmotubeProStatus, AtmotubeProBME280, AtmotubeProSGPC3,
     start_gatt_notifications, get_available_characteristics
     )
 
@@ -28,7 +28,7 @@ async def collect_data(mac: str, queue: asyncio.Queue,
     :param collection_time: The duration in seconds to collect data
     :type collection_time: int
     """
-    async def callback_queue(packet: AtmoTubePacket) -> None:
+    async def callback_queue(packet: AtmotubePacket) -> None:
         await queue.put(packet)
 
     device = await BleakScanner.find_device_by_address(mac)
@@ -45,7 +45,7 @@ async def collect_data(mac: str, queue: asyncio.Queue,
         await queue.put(None)
 
 
-def log_packet(packet: AtmoTubePacket) -> None:
+def log_packet(packet: AtmotubePacket) -> None:
     """
     Logs the received packet to the console.
 
@@ -53,24 +53,24 @@ def log_packet(packet: AtmoTubePacket) -> None:
     :type packet: AtmoTubePacket
     """
     match packet:
-        case StatusPacket():
+        case AtmotubeProStatus():
             logging.info(f"{str(packet.date_time)} - Status Packet - "
                          f"Battery: {packet.battery_level}%, "
                          f"PM Sensor: {packet.pm_sensor_status}, "
                          f"Pre-heating: {packet.pre_heating}, "
                          f"Error: {packet.error_flag}")
-        case SPS30Packet():
+        case AtmotubeProSPS30():
             logging.info(f"{str(packet.date_time)} - SPS30 Packet - "
                          f"PM1: {packet.pm1} µg/m³, "
                          f"PM2.5: {packet.pm2_5} µg/m³, "
                          f"PM4: {packet.pm4} µg/m³, "
                          f"PM10: {packet.pm10} µg/m³")
-        case BME280Packet():
+        case AtmotubeProBME280():
             logging.info(f"{str(packet.date_time)} - BME280 Packet - "
                          f"Humidity: {packet.humidity}%, "
                          f"Temperature: {packet.temperature}°C, "
                          f"Pressure: {packet.pressure} mbar")
-        case SGPC3Packet():
+        case AtmotubeProSGPC3():
             logging.info(f"{str(packet.date_time)} - SGPC3 Packet - "
                          f"TVOC: {packet.tvoc} ppb")
         case _:
