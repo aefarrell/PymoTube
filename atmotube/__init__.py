@@ -1,6 +1,7 @@
-from .gatt_notify import (InvalidAtmoTubeService,
-                          start_gatt_notifications,
-                          get_available_characteristics)
+from .gatt import (InvalidAtmoTubeService,
+                   gatt_notify,
+                   start_gatt_notifications,
+                   get_available_characteristics)
 from .packets import (InvalidByteData,
                       AtmoTubePacket,
                       StatusPacket,
