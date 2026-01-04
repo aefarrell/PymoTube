@@ -1,0 +1,3 @@
+[submodule "tests/pytest_bleak"]
+	path = tests/pytest_bleak
+	url = https://github.com/AstraLuma/nat20.git
