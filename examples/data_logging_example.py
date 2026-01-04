@@ -9,7 +9,7 @@ from bleak import BleakClient, BleakScanner
 from atmotube import (
     AtmoTubePacket,
     SPS30Packet, StatusPacket, BME280Packet, SGPC3Packet,
-    start_gatt_notifications, get_available_services
+    start_gatt_notifications, get_available_characteristics
     )
 
 import asyncio
@@ -38,7 +38,7 @@ async def collect_data(mac: str, queue: asyncio.Queue,
     async with BleakClient(device) as client:
         if not client.is_connected:
             raise Exception("Failed to connect to device")
-        packet_list = get_available_services(client)
+        packet_list = get_available_characteristics(client)
         await start_gatt_notifications(client, callback_queue,
                                        packet_list=packet_list)
         await asyncio.sleep(collection_time)

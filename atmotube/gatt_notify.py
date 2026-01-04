@@ -5,7 +5,7 @@ from typing import TypeAlias
 import asyncio
 import inspect
 
-from .uuids import AtmoTube_PRO_UUID
+from .uuids import AtmoTube_Service_UUID, AtmoTube_PRO_UUID
 from .packets import (
     AtmoTubePacket,
     StatusPacket, SPS30Packet, BME280Packet, SGPC3Packet)
@@ -18,18 +18,24 @@ ALL_PACKETS = [(AtmoTube_PRO_UUID.STATUS, StatusPacket),
                (AtmoTube_PRO_UUID.SGPC3, SGPC3Packet)]
 
 
-def get_available_services(client: BleakClient) -> PacketList:
+class InvalidAtmoTubeService(Exception):
+    pass
+
+
+def get_available_characteristics(client: BleakClient) -> PacketList:
     """
-    Get the list of supported services on the connected Atmotube device.
+    Get the list of supported GATT characteristics on the connected Atmotube
+    device.
 
     :param client: The BleakClient instance of the connected Atmotube device
     :type client: BleakClient
     :return: A list of tuples containing the UUIDs and packet classes
     :rtype: PacketList
     """
-    characteristics = [d.characteristic_uuid
-                       for c in client.services.characteristics.values()
-                       for d in c.descriptors]
+    srv = client.services.get_service(AtmoTube_Service_UUID.PRO)
+    if not srv:
+        raise InvalidAtmoTubeService("AtmoTube Pro service not found")
+    characteristics = [char.uuid.lower() for char in srv.characteristics]
     return [(uuid, packet_cls)
             for uuid, packet_cls in ALL_PACKETS
             if uuid.lower() in characteristics]
