@@ -38,7 +38,7 @@ def get_available_characteristics(client: BleakClient) -> PacketList:
     characteristics = [char.uuid.upper() for char in srv.characteristics]
     return [(uuid, ATMOTUBE_PRO_PACKETS.get(uuid))
             for uuid in characteristics
-            if uuid in ATMOTUBE_PRO_PACKETS.keys()]
+            if uuid in ATMOTUBE_PRO_PACKETS]
 
 
 def gatt_notify(client: BleakClient, uuid: str | AtmotubeProGATT_UUID,
