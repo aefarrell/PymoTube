@@ -4,9 +4,7 @@ from ctypes import (BigEndianStructure,
                     c_ubyte,
                     c_byte,
                     c_short,
-                    c_int,
-                    c_char,
-                    c_long)
+                    c_int)
 from datetime import datetime
 from typing import TypeAlias
 
@@ -17,10 +15,8 @@ class InvalidByteData(Exception):
     pass
 
 
-# I have no idea how to make this actually an abstract sub-class of
-# LittleEndianStructure so be mindful that this class is intended to be
-# abstract. It is only exposed to the user to use as a type hint for
-# functions that accept any Atmotube packet.
+# This class is intended to be abstract. It is only exposed to the user to use
+# as a type hint forfunctions that accept any Atmotube packet.
 class AtmotubeGATTPacket(LittleEndianStructure):
     """
     Abstract base class for Atmotube data packets.
@@ -94,18 +90,16 @@ class AtmotubeProStatus(AtmotubeGATTPacket):
                 f"battery_level={self.battery_level}%)")
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, AtmotubeProStatus):
-            return all((self.date_time == other.date_time,
-                        self.pm_sensor_status == other.pm_sensor_status,
-                        self.error_flag == other.error_flag,
-                        self.bonding_flag == other.bonding_flag,
-                        self.charging == other.charging,
-                        self.charging_timer == other.charging_timer,
-                        self.pre_heating == other.pre_heating,
-                        self.battery_level == other.battery_level))
-        else:
+        if not isinstance(other, AtmotubeProStatus):
             return False
-
+        return all((self.date_time == other.date_time,
+                    self.pm_sensor_status == other.pm_sensor_status,
+                    self.error_flag == other.error_flag,
+                    self.bonding_flag == other.bonding_flag,
+                    self.charging == other.charging,
+                    self.charging_timer == other.charging_timer,
+                    self.pre_heating == other.pre_heating,
+                    self.battery_level == other.battery_level))
 
 class AtmotubeProSPS30(AtmotubeGATTPacket):
     """
@@ -139,14 +133,13 @@ class AtmotubeProSPS30(AtmotubeGATTPacket):
                 f"pm10={self.pm10}µg/m³, pm4={self.pm4}µg/m³)")
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, AtmotubeProSPS30):
-            return all((self.date_time == other.date_time,
-                        self.pm1 == other.pm1,
-                        self.pm2_5 == other.pm2_5,
-                        self.pm10 == other.pm10,
-                        self.pm4 == other.pm4))
-        else:
+        if not isinstance(other, AtmotubeProSPS30):
             return False
+        return all((self.date_time == other.date_time,
+                    self.pm1 == other.pm1,
+                    self.pm2_5 == other.pm2_5,
+                    self.pm10 == other.pm10,
+                    self.pm4 == other.pm4))
 
 
 class AtmotubeProBME280(AtmotubeGATTPacket):
@@ -177,13 +170,12 @@ class AtmotubeProBME280(AtmotubeGATTPacket):
                 f"pressure={self.pressure}mbar)")
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, AtmotubeProBME280):
-            return all((self.date_time == other.date_time,
-                        self.humidity == other.humidity,
-                        self.temperature == other.temperature,
-                        self.pressure == other.pressure))
-        else:
+        if not isinstance(other, AtmotubeProBME280):
             return False
+        return all((self.date_time == other.date_time,
+                    self.humidity == other.humidity,
+                    self.temperature == other.temperature,
+                    self.pressure == other.pressure))
 
 
 class AtmotubeProSGPC3(AtmotubeGATTPacket):
@@ -207,12 +199,10 @@ class AtmotubeProSGPC3(AtmotubeGATTPacket):
                 f"tvoc={self.tvoc}ppb)")
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, AtmotubeProSGPC3):
-            return all((self.date_time == other.date_time,
-                        self.tvoc == other.tvoc))
-        else:
+        if not isinstance(other, AtmotubeProSGPC3):
             return False
-
+        return all((self.date_time == other.date_time,
+                    self.tvoc == other.tvoc))
 
 class AtmotubeBLEPacket(BigEndianStructure):
     """
@@ -305,22 +295,21 @@ class AtmotubeProBLEAdvertising(AtmotubeBLEPacket):
                 f"battery_level={self.battery_level}%)")
     
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, AtmotubeProBLEAdvertising):
-            return all((self.date_time == other.date_time,
-                        self.device_id == other.device_id,
-                        self.tvoc == other.tvoc,
-                        self.humidity == other.humidity,
-                        self.temperature == other.temperature,
-                        self.pressure == other.pressure,
-                        self.pm_sensor_status == other.pm_sensor_status,
-                        self.error_flag == other.error_flag,
-                        self.bonding_flag == other.bonding_flag,
-                        self.charging == other.charging,
-                        self.charging_timer == other.charging_timer,
-                        self.pre_heating == other.pre_heating,
-                        self.battery_level == other.battery_level))
-        else:
+        if not isinstance(other, AtmotubeProBLEAdvertising):
             return False
+        return all((self.date_time == other.date_time,
+                    self.device_id == other.device_id,
+                    self.tvoc == other.tvoc,
+                    self.humidity == other.humidity,
+                    self.temperature == other.temperature,
+                    self.pressure == other.pressure,
+                    self.pm_sensor_status == other.pm_sensor_status,
+                    self.error_flag == other.error_flag,
+                    self.bonding_flag == other.bonding_flag,
+                    self.charging == other.charging,
+                    self.charging_timer == other.charging_timer,
+                    self.pre_heating == other.pre_heating,
+                    self.battery_level == other.battery_level))
 
 
 class AtmotubeProBLEScanResponse(AtmotubeBLEPacket):
@@ -354,11 +343,10 @@ class AtmotubeProBLEScanResponse(AtmotubeBLEPacket):
                 f"firmware_version={self.firmware_version})")
     
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, AtmotubeProBLEScanResponse):
-            return all((self.date_time == other.date_time,
-                        self.pm1 == other.pm1,
-                        self.pm2_5 == other.pm2_5,
-                        self.pm10 == other.pm10,
-                        self.firmware_version == other.firmware_version))
-        else:
+        if not isinstance(other, AtmotubeProBLEScanResponse):
             return False
+        return all((self.date_time == other.date_time,
+                    self.pm1 == other.pm1,
+                    self.pm2_5 == other.pm2_5,
+                    self.pm10 == other.pm10,
+                    self.firmware_version == other.firmware_version))

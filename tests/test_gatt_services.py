@@ -19,88 +19,35 @@ ALL_PACKETS = [(AtmotubeProGATT_UUID.STATUS, AtmotubeProStatus),
                (AtmotubeProGATT_UUID.SPS30, AtmotubeProSPS30),
                (AtmotubeProGATT_UUID.BME280, AtmotubeProBME280),
                (AtmotubeProGATT_UUID.SGPC3, AtmotubeProSGPC3)]
+
 TEST_PACKETS = {AtmotubeProGATT_UUID.STATUS: bytearray(b'Ad'),
                 AtmotubeProGATT_UUID.SPS30: bytearray(b'd\x00\x00\xb9\x00\x00J\x01\x00o\x00\x00'),
                 AtmotubeProGATT_UUID.BME280: bytearray(b'\x0e\x17\x8ao\x01\x00\x1a\t'),
                 AtmotubeProGATT_UUID.SGPC3: bytearray(b'\x02\x00\x00\x00')}
 
 
-def test_get_available_characteristics_all():
+@pytest.mark.parametrize("uuid_list,packet_list", [
+    ([uuid for uuid, _ in ALL_PACKETS], ALL_PACKETS),
+    ([uuid for uuid, _ in ALL_PACKETS if uuid != AtmotubeProGATT_UUID.SPS30],
+     [(u, p) for u, p in ALL_PACKETS if u != AtmotubeProGATT_UUID.SPS30]),
+    ([], []),
+    ([uuid for uuid, _ in ALL_PACKETS]+
+     ["00001234-0000-1000-8000-00805f9b34fb"],
+     ALL_PACKETS)
+    ])
+def test_get_available_characteristics(uuid_list, packet_list):
+    # Mock BleakClient
     client = Mock(spec=BleakClient)
     client.services.get_service.return_value = Mock(
         uuid=AtmotubeProService_UUID.PRO,
-        characteristics=[
-            Mock(uuid=AtmotubeProGATT_UUID.SGPC3),
-            Mock(uuid=AtmotubeProGATT_UUID.BME280),
-            Mock(uuid=AtmotubeProGATT_UUID.STATUS),
-            Mock(uuid=AtmotubeProGATT_UUID.SPS30),
-        ]
+        characteristics=[Mock(uuid=uuid) for uuid in uuid_list]
     )
-
     # Call the function
-    packet_list = get_available_characteristics(client)
+    returned_list = get_available_characteristics(client)
 
     # Assertions
-    assert len(packet_list) == len(ALL_PACKETS)
-    assert set(packet_list) == set(ALL_PACKETS)
-
-
-def test_get_available_characteristics_no_pm():
-    client = Mock(spec=BleakClient)
-    client.services.get_service.return_value = Mock(
-        uuid=AtmotubeProService_UUID.PRO,
-        characteristics=[
-            Mock(uuid=AtmotubeProGATT_UUID.SGPC3),
-            Mock(uuid=AtmotubeProGATT_UUID.BME280),
-            Mock(uuid=AtmotubeProGATT_UUID.STATUS),
-        ]
-    )
-
-    # Call the function
-    packet_list = get_available_characteristics(client)
-    expected_packet_list = [(uuid, packet_cls)
-                            for uuid, packet_cls in ALL_PACKETS
-                            if uuid != AtmotubeProGATT_UUID.SPS30]
-
-    # Assertions
-    assert len(packet_list) == len(expected_packet_list)
-    assert set(packet_list) == set(expected_packet_list)
-
-
-def test_get_available_characteristics_empty():
-    client = Mock(spec=BleakClient)
-    client.services.get_service.return_value = Mock(
-        uuid=AtmotubeProService_UUID.PRO,
-        characteristics=[]
-    )
-
-    # Call the function
-    packet_list = get_available_characteristics(client)
-
-    # Assertions
-    assert packet_list == []
-
-
-def test_get_available_characteristics_extra():
-    client = Mock(spec=BleakClient)
-    client.services.get_service.return_value = Mock(
-        uuid=AtmotubeProService_UUID.PRO,
-        characteristics=[
-            Mock(uuid=AtmotubeProGATT_UUID.SGPC3),
-            Mock(uuid=AtmotubeProGATT_UUID.BME280),
-            Mock(uuid=AtmotubeProGATT_UUID.STATUS),
-            Mock(uuid="00001234-0000-1000-8000-00805f9b34fb"),  # Extra UUID
-        ]
-    )
-
-    # Call the function
-    packet_list = get_available_characteristics(client)
-    expected_packet_list = [(uuid, packet_cls)
-                            for uuid, packet_cls in ALL_PACKETS
-                            if uuid != AtmotubeProGATT_UUID.SPS30]
-    # Assertions
-    assert len(packet_list) == len(expected_packet_list)
-    assert set(packet_list) == set(expected_packet_list)
+    assert len(returned_list) == len(packet_list)
+    assert set(returned_list) == set(packet_list)
 
 
 def test_get_available_characteristics_invalid_service():
