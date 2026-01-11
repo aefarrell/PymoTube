@@ -3,9 +3,9 @@
 
 A simple package for retrieving data from an AtmoTube PRO via [bluetooth](https://support.atmotube.com/en/articles/10364981-bluetooth-api#h_150b16091e). Currently it is just a set of helper classes for taking bytearrays returned by an AtmoTube PRO and turning it into a basic struct. This package is intended to be used with [bleak](https://github.com/hbldh/bleak), a bluetooth library for Python. It does not handle connecting to the device or subscribing to notifications itself.
 
-This package only supports the AtmoTube PRO device, and has only been tested with that device. I do not own any other AtmoTube devices, but reading the API documentation, I don't imagine they would work. I am open to extending this package to support other AtmoTube devices if someone with one of those devices would be willing to help test it. This package mostly exists so that you don't have to remember what all the UUIDs are and how to decode the bytearrays yourself.
+This package only supports the AtmoTube PRO device, and has only been tested with that device. I do not own any other AtmoTube devices, but reading the API documentation, I don't imagine they would work. I am open to extending this package to support other AtmoTube devices if someone with one of those devices would be willing to help test it. This package mostly exists so that you don't have to remember all the UUIDs and how to decode the bytearrays yourself.
 
-There are two worked examples included in the `examples` directory, one for subscribing to GATT characteristics and one for listening to BLE advertisement and scan response packets. Both examples simply log the received packets to the console, but they can be easily extended to do something more useful, like storing it in a database or loggint it to a csv.
+There are two worked examples included in the `examples` directory, one for subscribing to GATT characteristics and one for listening to BLE advertisement and scan response packets. Both examples simply log the received packets to the console, but they can be easily extended to do something more useful, like storing it in a database or logging it to a csv.
 
 ## Installation
 
@@ -17,7 +17,7 @@ cd PymoTube
 pip install .
 ```
 
-Or you can download the latest release from the side bar and install it with pip:
+Or you can download [the latest release](https://github.com/aefarrell/PymoTube/releases) and install it with pip:
 
 ```bash
 pip install PymoTube-x.y.z.tar.gz
@@ -187,7 +187,7 @@ Received a packet from None: None
 Received a packet from ATMOTUBE: AtmotubeProBLEAdvertising(date_time=2026-01-10 17:54:14.302703, device_id=12863, tvoc=Noneppb, humidity=29%, temperature=22°C, pressure=939.32mbar, pm_sensor_status=True, error_flag=False, bonding_flag=False, charging=True, charging_timer=False, pre_heating=False, battery_level=99%)
 ```
 
-Note that some packets may not be from an AtmoTube PRO device, in which case the device and packet will be `None`. Also note that the level precision is less than what you get when subscribed to GATT notifications, this is especially notable for PM measurements which are given to the nearest integer value of ug/m^3.
+Note that some packets may not be from an AtmoTube PRO device, in which case the device and packet will be `None`. Also note that the level of precision is less than what you get when subscribed to GATT notifications, this is especially notable for PM measurements which are given to the nearest integer value of ug/m^3.
 
 ### The BLE Advertisement and Scan Response Data Classes
 
