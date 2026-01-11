@@ -101,6 +101,7 @@ class AtmotubeProStatus(AtmotubeGATTPacket):
                     self.pre_heating == other.pre_heating,
                     self.battery_level == other.battery_level))
 
+
 class AtmotubeProSPS30(AtmotubeGATTPacket):
     """
     Represents the SPS30 particulate matter sensor data packet from an
@@ -204,6 +205,7 @@ class AtmotubeProSGPC3(AtmotubeGATTPacket):
         return all((self.date_time == other.date_time,
                     self.tvoc == other.tvoc))
 
+
 class AtmotubeBLEPacket(BigEndianStructure):
     """
     Abstract base class for Atmotube data packets.
@@ -243,7 +245,6 @@ class AtmotubeProBLEAdvertising(AtmotubeBLEPacket):
     """
     Represents the BLE advertising packet from an Atmotube PRO device.
     """
-    #>hhbblbb
     _fields_: FieldList = [
         ('_tvoc', c_short, 16),
         ('_devid', c_short, 16),
@@ -278,7 +279,7 @@ class AtmotubeProBLEAdvertising(AtmotubeBLEPacket):
         self.charging_timer = bool(self._charging_timer)
         self.pre_heating = bool(self._pre_heating)
         self.battery_level = self._battery
-    
+
     def __str__(self) -> str:
         return (f"AtmotubeProBLEAdvertising(date_time={str(self.date_time)}, "
                 f"device_id={self.device_id}, "
@@ -293,7 +294,7 @@ class AtmotubeProBLEAdvertising(AtmotubeBLEPacket):
                 f"charging_timer={self.charging_timer}, "
                 f"pre_heating={self.pre_heating}, "
                 f"battery_level={self.battery_level}%)")
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, AtmotubeProBLEAdvertising):
             return False
@@ -334,14 +335,14 @@ class AtmotubeProBLEScanResponse(AtmotubeBLEPacket):
         self.pm2_5 = self._pm2_5 if self._pm2_5 > 0 else None
         self.pm10 = self._pm10 if self._pm10 > 0 else None
         self.firmware_version = f"{self._fw_maj}.{self._fw_min}.{self._fw_bld}"
-    
+
     def __str__(self) -> str:
         return (f"AtmotubeProBLEScanResponse(date_time={str(self.date_time)}, "
                 f"pm1={self.pm1}µg/m³, "
                 f"pm2_5={self.pm2_5}µg/m³, "
                 f"pm10={self.pm10}µg/m³, "
                 f"firmware_version={self.firmware_version})")
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, AtmotubeProBLEScanResponse):
             return False
