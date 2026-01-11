@@ -5,6 +5,8 @@ A simple package for retrieving data from an AtmoTube PRO via [bluetooth](https:
 
 This package only supports the AtmoTube PRO device, and has only been tested with that device. I do not own any other AtmoTube devices, but reading the API documentation, I don't imagine they would work. I am open to extending this package to support other AtmoTube devices if someone with one of those devices would be willing to help test it. This package mostly exists so that you don't have to remember what all the UUIDs are and how to decode the bytearrays yourself.
 
+There are two worked examples included in the `examples` directory, one for subscribing to GATT characteristics and one for listening to BLE advertisement and scan response packets. Both examples simply log the received packets to the console, but they can be easily extended to do something more useful, like storing it in a database or loggint it to a csv.
+
 ## Installation
 
 Pymotube is not available through pip yet, possibly ever, but you can install it directly from GitHub (bleeding edge):
